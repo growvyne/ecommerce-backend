@@ -10,15 +10,17 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // 1. CORS MUST GO FIRST
+
 // 1. CORS MUST GO FIRST
 const allowedOrigins = [
   "http://localhost:5173",
   "http://192.168.1.6:5173",
+  "https://happizing-nine.vercel.app" // 👈 Add your exact Vercel production domain here
 ];
 
 app.use(
   cors({
-    origin: allowedOrigins, // Passing the array directly forces express to check both automatically
+    origin: allowedOrigins,
     credentials: true,
   })
 );
