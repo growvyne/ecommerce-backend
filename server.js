@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3000;
 const allowedOrigins = [
   "http://localhost:5173",
   "http://192.168.1.6:5173",
-  "https://happizing-nine.vercel.app" // 👈 Add your exact Vercel production domain here
+  "happizing-frontend.vercel.app" // 👈 Add your exact Vercel production domain here
 ];
 
 app.use(
