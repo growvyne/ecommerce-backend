@@ -10,20 +10,15 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // 1. CORS MUST GO FIRST
+// 1. CORS MUST GO FIRST
 const allowedOrigins = [
   "http://localhost:5173",
-  "http://192.168.1.6:5173", // your current local network IP
+  "http://192.168.1.6:5173",
 ];
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error(`CORS not allowed for origin: ${origin}`));
-      }
-    },
+    origin: allowedOrigins, // Passing the array directly forces express to check both automatically
     credentials: true,
   })
 );
