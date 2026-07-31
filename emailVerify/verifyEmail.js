@@ -10,17 +10,18 @@ export const verifyEmail = async (token, email) => {
     return;
   }
 
-  // Explicit cloud-optimized connection mapping
+ // UPDATED: Standard Port 587 configuration to bypass cloud hosting firewalls
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
-    port: 465,
-    secure: true, 
+    port: 587,
+    secure: false, // Must be false for port 587
     auth: {
       user: process.env.MAIL_USER,
       pass: process.env.MAIL_PASS,
     },
-    debug: true,   // 👈 Enables detailed protocol logging
-    logger: true,  // 👈 Prints SMTP traffic directly to Render console
+    tls: {
+      rejectUnauthorized: false 
+    }
   });
 
   const frontendUrl = process.env.FRONTEND_URL || "http://192.168.1.6:5173";
