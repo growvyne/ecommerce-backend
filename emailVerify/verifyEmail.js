@@ -2,13 +2,12 @@ import nodemailer from "nodemailer";
 
 export const verifyEmail = async (token, email) => {
   console.log("========== VERIFY EMAIL ==========");
-  console.log("token:", token);
-  console.log("email:", email);
-
+  
   if (!email) {
     console.log("ERROR: Email is missing!");
     return;
   }
+
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -16,6 +15,9 @@ export const verifyEmail = async (token, email) => {
       pass: process.env.MAIL_PASS,
     },
   });
+
+  // Use the environment variable if it exists, otherwise fall back to network IP for testing
+  const frontendUrl = process.env.FRONTEND_URL || "http://192.168.1.6:5173";
 
   const mailConfigurations = {
     from: process.env.MAIL_USER,
@@ -25,12 +27,10 @@ export const verifyEmail = async (token, email) => {
 
 Please verify your email by clicking the link below:
 
-http://localhost:5173/verify/${token}
+${frontendUrl}/verify/${token}
 
 Thanks`,
   };
-
-  console.log("mailConfigurations:", mailConfigurations);
 
   try {
     const info = await transporter.sendMail(mailConfigurations);
