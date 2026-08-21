@@ -1,37 +1,42 @@
-import createGmailSend from "gmail-send";
+import nodemailer from "nodemailer";
 
 export const verifyEmail = async (token, email) => {
-  console.log("========== START VERIFY EMAIL ROUTE ==========");
-  console.log("Target Email:", email);
-  
+  console.log("========== VERIFY EMAIL ==========");
+  console.log("token:", token);
+  console.log("email:", email);
+
   if (!email) {
-    console.log("ERROR: Target email parameter is completely missing!");
+    console.log("ERROR: Email is missing!");
     return;
   }
-
-  // Uses HTTPS API calls under the hood to bypass Render's firewall entirely
-  const send = createGmailSend({
-    user: process.env.MAIL_USER, // Your Gmail address
-    pass: process.env.MAIL_PASS, // Your 16-character Google App Password
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.MAIL_USER,
+      pass: process.env.MAIL_PASS,
+    },
   });
 
-  const frontendUrl = process.env.FRONTEND_URL || "http://192.168.1.6:5173";
+  const mailConfigurations = {
+    from: process.env.MAIL_USER,
+    to: email,
+    subject: "Email Verification",
+    text: `Hi!
+
+Please verify your email by clicking the link below:
+
+http://localhost:5173/verify/${token}
+
+Thanks`,
+  };
+
+  console.log("mailConfigurations:", mailConfigurations);
 
   try {
-    console.log("Sending verification email via Google API...");
-    
-    const res = await send({
-      to: email,
-      subject: "Email Verification",
-      text: `Hi!\n\nPlease verify your email by clicking the link below:\n\n${frontendUrl}/verify/${token}\n\nThanks`,
-    });
-
-    console.log("✅ Email Sent Successfully!");
-    console.log(res);
+    const info = await transporter.sendMail(mailConfigurations);
+    console.log("Email Sent Successfully");
+    console.log(info.response);
   } catch (error) {
-    console.error("❌ CRITICAL EMAIL ERROR RECORDED:");
-    console.error(error.message || error);
+    console.error("Email Error:", error);
   }
-  
-  console.log("========== END VERIFY EMAIL ROUTE ==========");
 };

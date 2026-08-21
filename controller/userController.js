@@ -443,7 +443,12 @@ export const updateUser = async (req, res) => {
       return res.status(401).json({ success: false, message: "Authentication required" });
     }
 
-    if (loggedInUser.id.toString() !== userIdToUpdate && loggedInUser.role !== "Admin") {
+    // FIX 1: Use loggedInUser._id (Mongoose default)
+    // FIX 2: Check for both "admin" and "Admin" (or normalize to lowercase)
+    const isSelf = loggedInUser._id.toString() === userIdToUpdate;
+    const isAdminUser = loggedInUser.role?.toLowerCase() === "admin";
+
+    if (!isSelf && !isAdminUser) {
       return res.status(403).json({ success: false, message: "Not authorized" });
     }
 
@@ -461,6 +466,11 @@ export const updateUser = async (req, res) => {
     user.address = req.body.address || user.address;
     user.zipCode = req.body.zipCode || user.zipCode;
 
+    // Allow role update if the logged-in user is an Admin
+    if (req.body.role && isAdminUser) {
+      user.role = req.body.role;
+    }
+
     // Handle Profile Picture Upload
     if (req.file) {
       console.log("Uploading image...");
@@ -471,9 +481,6 @@ export const updateUser = async (req, res) => {
         folder: "happyzing/profile",
       });
 
-      //console.log("UPLOAD SUCCESS:", uploadResult.secure_url);
-
-      
       user.profilepic = uploadResult.secure_url;          
       user.profilePicPublicId = uploadResult.public_id;
     }
